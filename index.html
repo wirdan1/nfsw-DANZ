@@ -7,8 +7,21 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let lastImageURL = "";
+        let userLimit = 25; // Limit awal
+
+        function updateLimitDisplay() {
+            document.getElementById("limitDisplay").innerText = `Sisa Limit: ${userLimit}`;
+            if (userLimit <= 0) {
+                document.getElementById("purchaseContainer").style.display = "block";
+            }
+        }
 
         async function nsfwgenerator(prompt) {
+            if (userLimit <= 0) {
+                alert("Limit Anda telah habis! Silakan beli limit terlebih dahulu.");
+                return;
+            }
+
             try {
                 let response = await axios.get(`https://1yjs1yldj7.execute-api.us-east-1.amazonaws.com/default/ai_image?prompt=${prompt}&aspect_ratio=Select Aspect Ratio&link=writecream.com`);
                 let nsfw = response.data;
@@ -18,6 +31,8 @@
                 document.getElementById("imageContainer").style.display = "block";
 
                 lastImageURL = nsfw.image_link;
+                userLimit--; // Kurangi limit setiap kali generate
+                updateLimitDisplay();
             } catch (error) {
                 alert("Gagal mengambil gambar, coba lagi!");
                 console.error(error);
@@ -44,7 +59,6 @@
         }
     </script>
     <style>
-        /* Efek gradasi halus */
         @keyframes bgAnimation {
             0% { background: linear-gradient(120deg, #1e3c72, #2a5298); }
             25% { background: linear-gradient(120deg, #16222a, #3a6073); }
@@ -118,7 +132,6 @@
             transform: scale(1.05);
         }
 
-        /* Kartu hasil */
         .card {
             display: none;
             margin-top: 20px;
@@ -154,12 +167,44 @@
             background: #45a049;
             transform: scale(1.05);
         }
+
+        #purchaseContainer {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 235, 204, 0.7); /* Transparan */
+            border-radius: 5px;
+            text-align: center;
+            backdrop-filter: blur(5px); /* Efek blur */
+        }
+
+        #purchaseContainer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #purchaseContainer a {
+            display: inline-block;
+            padding: 10px;
+            background: #25d366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #purchaseContainer a:hover {
+            background: #1ebe5d;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>AI Image Generator</h2>
+        <p id="limitDisplay">Sisa Limit: 25</p>
         <input type="text" id="prompt" placeholder="Masukkan prompt...">
         <button onclick="generateImage()">Generate Image</button>
 
@@ -167,6 +212,18 @@
             <h3>Generated Image:</h3>
             <img id="resultImage" alt="Generated Image">
             <button class="copy-btn" onclick="copyURL()">📋 Copy Image URL</button>
+        </div>
+
+        <div id="purchaseContainer">
+            <h3>Limit Anda Habis!</h3>
+            <p>Silakan beli limit tambahan:</p>
+            <ul>
+                <li>100 Limit - Rp 5.000</li>
+                <li>500 Limit - Rp 20.000</li>
+                <li>1000 Limit - Rp 35.000</li>
+                <li>2000 Limit - Rp 45.000</li>
+            </ul>
+            <a href="https://wa.me/62895323195263?text=Halo%20Admin,%20saya%20ingin%20membeli%20limit%20AI%20Image%20Generator">Beli Sekarang via WhatsApp</a>
         </div>
     </div>
 
