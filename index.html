@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        let lastImageURL = "";
+
+        async function nsfwgenerator(prompt) {
+            try {
+                let response = await axios.get(`https://1yjs1yldj7.execute-api.us-east-1.amazonaws.com/default/ai_image?prompt=${prompt}&aspect_ratio=Select Aspect Ratio&link=writecream.com`);
+                let nsfw = response.data;
+
+                document.getElementById("resultImage").src = nsfw.image_link;
+                document.getElementById("resultImage").style.display = "block";
+                document.getElementById("imageContainer").style.display = "block";
+
+                lastImageURL = nsfw.image_link;
+            } catch (error) {
+                alert("Gagal mengambil gambar, coba lagi!");
+                console.error(error);
+            }
+        }
+
+        function generateImage() {
+            let prompt = document.getElementById("prompt").value;
+            if (prompt.trim() === "") {
+                alert("Masukkan prompt terlebih dahulu!");
+                return;
+            }
+            nsfwgenerator(prompt);
+        }
+
+        function copyURL() {
+            if (lastImageURL) {
+                navigator.clipboard.writeText(lastImageURL).then(() => {
+                    alert("URL gambar berhasil disalin!");
+                });
+            } else {
+                alert("Tidak ada gambar untuk disalin!");
+            }
+        }
+    </script>
+    <style>
+        /* Efek gradasi halus */
+        @keyframes bgAnimation {
+            0% { background: linear-gradient(120deg, #1e3c72, #2a5298); }
+            25% { background: linear-gradient(120deg, #16222a, #3a6073); }
+            50% { background: linear-gradient(120deg, #ff758c, #ff7eb3); }
+            75% { background: linear-gradient(120deg, #3a1c71, #d76d77, #ffaf7b); }
+            100% { background: linear-gradient(120deg, #1e3c72, #2a5298); }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: bgAnimation 20s infinite alternate ease-in-out;
+            transition: background 0.5s ease-in-out;
+            color: white;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #ff758c;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #ff5864;
+            transform: scale(1.05);
+        }
+
+        /* Kartu hasil */
+        .card {
+            display: none;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            margin-top: 10px;
+        }
+
+        .copy-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>AI Image Generator</h2>
+        <input type="text" id="prompt" placeholder="Masukkan prompt...">
+        <button onclick="generateImage()">Generate Image</button>
+
+        <div id="imageContainer" class="card">
+            <h3>Generated Image:</h3>
+            <img id="resultImage" alt="Generated Image">
+            <button class="copy-btn" onclick="copyURL()">📋 Copy Image URL</button>
+        </div>
+    </div>
+
+</body>
+</html>
